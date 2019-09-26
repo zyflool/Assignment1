@@ -1,6 +1,5 @@
 package com.example.assignment1;
 
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
