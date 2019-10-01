@@ -1,23 +1,8 @@
 package com.example.assignment1.Model;
 
-import java.util.List;
+import org.litepal.crud.LitePalSupport;
 
-public class Repo {
-
-    /**
-     * author : testerSunshine
-     * name : 12306
-     * avatar : https://github.com/testerSunshine.png
-     * url : https://github.com/testerSunshine/12306
-     * description : 12306智能刷票，订票
-     * language : Python
-     * languageColor : #3572A5
-     * stars : 8950
-     * forks : 2718
-     * currentPeriodStars : 508
-     * builtBy : [{"username":"testerSunshine","href":"https://github.com/testerSunshine","avatar":"https://avatars3.githubusercontent.com/u/20162049"},{"username":"MonsterTan","href":"https://github.com/MonsterTan","avatar":"https://avatars1.githubusercontent.com/u/22610809"},{"username":"cclauss","href":"https://github.com/cclauss","avatar":"https://avatars3.githubusercontent.com/u/3709715"},{"username":"stormeyes","href":"https://github.com/stormeyes","avatar":"https://avatars3.githubusercontent.com/u/5072174"},{"username":"BlancRay","href":"https://github.com/BlancRay","avatar":"https://avatars1.githubusercontent.com/u/9410067"}]
-     */
-
+public class Repo extends LitePalSupport {
     private String author;
     private String name;
     private String avatar;
@@ -27,8 +12,6 @@ public class Repo {
     private String languageColor;
     private int stars;
     private int forks;
-    private int currentPeriodStars;
-    private List<BuiltByBean> builtBy;
 
     public String getAuthor() {
         return author;
@@ -100,57 +83,5 @@ public class Repo {
 
     public void setForks(int forks) {
         this.forks = forks;
-    }
-
-    public int getCurrentPeriodStars() {
-        return currentPeriodStars;
-    }
-
-    public void setCurrentPeriodStars(int currentPeriodStars) {
-        this.currentPeriodStars = currentPeriodStars;
-    }
-
-    public List<BuiltByBean> getBuiltBy() {
-        return builtBy;
-    }
-
-    public void setBuiltBy(List<BuiltByBean> builtBy) {
-        this.builtBy = builtBy;
-    }
-
-    public static class BuiltByBean {
-        /**
-         * username : testerSunshine
-         * href : https://github.com/testerSunshine
-         * avatar : https://avatars3.githubusercontent.com/u/20162049
-         */
-
-        private String username;
-        private String href;
-        private String avatar;
-
-        public String getUsername() {
-            return username;
-        }
-
-        public void setUsername(String username) {
-            this.username = username;
-        }
-
-        public String getHref() {
-            return href;
-        }
-
-        public void setHref(String href) {
-            this.href = href;
-        }
-
-        public String getAvatar() {
-            return avatar;
-        }
-
-        public void setAvatar(String avatar) {
-            this.avatar = avatar;
-        }
     }
 }

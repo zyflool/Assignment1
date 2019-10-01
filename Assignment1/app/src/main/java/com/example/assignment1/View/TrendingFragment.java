@@ -1,8 +1,6 @@
 package com.example.assignment1.View;
 
-import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -15,7 +13,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -32,8 +29,6 @@ import com.example.assignment1.utils.SetImageViewByURL;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import io.reactivex.internal.fuseable.HasUpstreamObservableSource;
 
 import static androidx.core.util.Preconditions.checkNotNull;
 
@@ -70,11 +65,6 @@ public class TrendingFragment extends Fragment implements TrendingContract.View 
     @Override
     public void setPresenter(TrendingContract.Presenter presenter) {
         mPresenter = checkNotNull(presenter);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        mPresenter.result(requestCode, resultCode);
     }
 
     @Nullable
@@ -137,7 +127,7 @@ public class TrendingFragment extends Fragment implements TrendingContract.View 
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.fragment_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
@@ -149,6 +139,7 @@ public class TrendingFragment extends Fragment implements TrendingContract.View 
         if (getView() == null) {
             return;
         }
+
         final SwipeRefreshLayout srl = getView().findViewById(R.id.refresh_layout);
 
         // Make sure setRefreshing() is called after the layout is done with everything else.
@@ -230,47 +221,10 @@ public class TrendingFragment extends Fragment implements TrendingContract.View 
             }
         }
 
-        private void toggle(TrendingHolder holder) {
-//            如果点击的就是开着的item，就关闭该item并把opened置-1
-            if ( opened == holder.getPosition() ) {
-                opened = -1;
-                holder.lanuage.setVisibility(View.GONE);
-                holder.detail.setVisibility(View.GONE);
-                holder.stars.setVisibility(View.GONE);
-                holder.forks.setVisibility(View.GONE);
-                holder.lanuageColor.setVisibility(View.GONE);
-                holder.starsNum.setVisibility(View.GONE);
-                holder.forksNum.setVisibility(View.GONE);
-            }
-            else {
-                int previous = opened;
-                opened = holder.getPosition();
-
-                final TrendingHolder oldHolder = (TrendingHolder) ((RecyclerView) holder.itemView.getParent()).findViewHolderForPosition(previous);
-
-                oldHolder.lanuage.setVisibility(View.GONE);
-                oldHolder.detail.setVisibility(View.GONE);
-                oldHolder.stars.setVisibility(View.GONE);
-                oldHolder.forks.setVisibility(View.GONE);
-                oldHolder.lanuageColor.setVisibility(View.GONE);
-                oldHolder.starsNum.setVisibility(View.GONE);
-                oldHolder.forksNum.setVisibility(View.GONE);
-
-                holder.lanuage.setVisibility(View.VISIBLE);
-                holder.detail.setVisibility(View.VISIBLE);
-                holder.stars.setVisibility(View.VISIBLE);
-                holder.forks.setVisibility(View.VISIBLE);
-                holder.lanuageColor.setVisibility(View.VISIBLE);
-                holder.starsNum.setVisibility(View.VISIBLE);
-                holder.forksNum.setVisibility(View.VISIBLE);
-            }
-        }
-
-
     }
 
 
-    private class TrendingAdapter extends RecyclerView.Adapter<TrendingHolder> {
+    private class TrendingAdapter extends RecyclerView.Adapter<TrendingHolder> implements TrendingItemListener{
 
         private List<Repo> mRepos;
 
@@ -319,12 +273,48 @@ public class TrendingFragment extends Fragment implements TrendingContract.View 
             return mRepos.size();
         }
 
+        @Override
+        public void onRepoItemClick(TrendingHolder holder) {
+
+            if ( holder.opened == holder.getPosition() ) {
+                holder.opened = -1;
+                holder.lanuage.setVisibility(View.GONE);
+                holder.detail.setVisibility(View.GONE);
+                holder.stars.setVisibility(View.GONE);
+                holder.forks.setVisibility(View.GONE);
+                holder.lanuageColor.setVisibility(View.GONE);
+                holder.starsNum.setVisibility(View.GONE);
+                holder.forksNum.setVisibility(View.GONE);
+            }
+            else {
+                int previous = holder.opened;
+                holder.opened = holder.getPosition();
+
+                final TrendingHolder oldHolder = (TrendingHolder) ((RecyclerView) holder.itemView.getParent()).findViewHolderForPosition(previous);
+
+                oldHolder.lanuage.setVisibility(View.GONE);
+                oldHolder.detail.setVisibility(View.GONE);
+                oldHolder.stars.setVisibility(View.GONE);
+                oldHolder.forks.setVisibility(View.GONE);
+                oldHolder.lanuageColor.setVisibility(View.GONE);
+                oldHolder.starsNum.setVisibility(View.GONE);
+                oldHolder.forksNum.setVisibility(View.GONE);
+
+                holder.lanuage.setVisibility(View.VISIBLE);
+                holder.detail.setVisibility(View.VISIBLE);
+                holder.stars.setVisibility(View.VISIBLE);
+                holder.forks.setVisibility(View.VISIBLE);
+                holder.lanuageColor.setVisibility(View.VISIBLE);
+                holder.starsNum.setVisibility(View.VISIBLE);
+                holder.forksNum.setVisibility(View.VISIBLE);
+            }
+        }
     }
 
 
     public interface TrendingItemListener {
 
-        void onTaskClick(Repo clickedTask);
+        void onRepoItemClick(TrendingHolder holder);
 
     }
 }

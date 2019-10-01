@@ -10,6 +10,8 @@ import com.example.assignment1.Presenter.TrendingPresenter;
 import com.example.assignment1.View.TrendingFragment;
 import com.example.assignment1.utils.ActivityUtils;
 
+import org.litepal.LitePal;
+
 public class MainActivity extends AppCompatActivity {
 
     private TrendingPresenter mTrendingPresenter = new TrendingPresenter();
@@ -18,6 +20,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        LitePal.initialize(this);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

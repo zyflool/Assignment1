@@ -25,8 +25,6 @@ public interface TrendingContract {
 
     interface Presenter extends BasePresenter {
 
-        void result(int requestCode, int resultCode);
-
         void sortByName();
 
         void sortByStar();
