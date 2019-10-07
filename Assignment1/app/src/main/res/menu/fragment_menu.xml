@@ -4,7 +4,7 @@
     <item
         android:id="@+id/menu_sort"
         android:title="Sort"
-        android:icon="@drawable/more"
+        android:icon="@drawable/more_black"
         app:showAsAction="always" />
     <item
         android:id="@+id/menu_stars"

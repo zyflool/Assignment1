@@ -34,7 +34,7 @@
             app:layout_constraintBottom_toBottomOf="@id/tv_nointernect_1"
             app:layout_constraintVertical_bais="100.0"
             app:layout_constraintHorizontal_bias="50.0"
-            android:src="@drawable/nointernet_connection"/>
+            android:src="@drawable/nointernet_connection" />
         
         <TextView
             android:id="@+id/tv_nointernect_1"
