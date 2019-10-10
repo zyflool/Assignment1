@@ -8,6 +8,10 @@ public class RetrofitWrapper {
     private Retrofit retrofit;
     private static RetrofitWrapper instance;
 
+    public class Constant {
+        public static final String BASE_URL = "https://github-trending-api.now.sh/";
+    }
+
     private RetrofitWrapper() {
         retrofit = new Retrofit.Builder()
                 .baseUrl(Constant.BASE_URL)
@@ -29,7 +33,4 @@ public class RetrofitWrapper {
         return retrofit.create(service);
     }
 
-    public class Constant {
-        public static final String BASE_URL = "https://github-trending-api.now.sh/";
-    }
 }

@@ -14,7 +14,7 @@ import org.litepal.LitePal;
 
 public class MainActivity extends AppCompatActivity {
 
-    private TrendingPresenter mTrendingPresenter = new TrendingPresenter();
+    private TrendingPresenter mTrendingPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +34,10 @@ public class MainActivity extends AppCompatActivity {
             ActivityUtils.addFragmentToActivity(
                     getSupportFragmentManager(), trendingFragment, R.id.contentView);
         }
+
+        // Create the presenter
+        mTrendingPresenter = new TrendingPresenter(Injection.provideReposRepository(getApplicationContext()), trendingFragment);
+
     }
 
 

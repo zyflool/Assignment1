@@ -22,6 +22,7 @@ import com.example.assignment1.Model.Repo;
 import com.example.assignment1.Model.RepoBean;
 import com.example.assignment1.Model.source.ReposDataSource;
 import com.example.assignment1.Model.source.local.ReposDao;
+import com.example.assignment1.utils.AppExecutors;
 import com.example.assignment1.utils.RepositoryService;
 import com.example.assignment1.utils.RetrofitWrapper;
 
@@ -42,15 +43,20 @@ public class ReposRemoteDataSource implements ReposDataSource {
 
     private ReposDao mReposDao;
 
-    public static ReposRemoteDataSource getInstance() {
+    private AppExecutors mAppExecutors;
+
+    public static ReposRemoteDataSource getInstance(@NonNull AppExecutors appExecutors, @NonNull ReposDao reposDao) {
         if (INSTANCE == null)
-            INSTANCE = new ReposRemoteDataSource();
+            INSTANCE = new ReposRemoteDataSource(appExecutors, reposDao);
         return INSTANCE;
     }
 
     // Prevent direct instantiation.
     // 防止直接实例化。
-    private ReposRemoteDataSource() {}
+    private ReposRemoteDataSource(@NonNull AppExecutors appExecutors, @NonNull ReposDao reposDao) {
+        mReposDao = reposDao;
+        mAppExecutors = appExecutors;
+    }
 
     /**
      * Note: {@link LoadReposCallback#onDataNotAvailable()} is never fired. In a real remote data
@@ -61,33 +67,46 @@ public class ReposRemoteDataSource implements ReposDataSource {
      */
     @Override
     public void getRepos(final @NonNull LoadReposCallback callback) {
-        final List<Repo> repos = new ArrayList<>();
-        RepositoryService repositoryService = RetrofitWrapper.getInstance().create(RepositoryService.class);
-        Call<List<RepoBean>> call = repositoryService.getRepos();
-        call.enqueue(new Callback<List<RepoBean>>() {
+        Runnable runnable = new Runnable() {
             @Override
-            public void onResponse(Call<List<RepoBean>> call, Response<List<RepoBean>> response) {
-                if (response.isSuccessful()) {
-                    List<RepoBean> repoBeans = response.body();
-                    int n = repoBeans.size();
-                    for ( int i = 0 ; i < n ; i++ ) {
-                        RepoBean temp = repoBeans.get(i);
-                        repos.add(new Repo(temp.getAuthor(), temp.getAvatar(), temp.getName(),
-                                temp.getUrl(), temp.getDescription(), temp.getLanguage(),
-                                temp.getLanguageColor(), temp.getStars(), temp.getForks()));
+            public void run() {
+                final List<Repo> repos = new ArrayList<>();
+                mAppExecutors.mainThread().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        RepositoryService repositoryService = RetrofitWrapper.getInstance().create(RepositoryService.class);
+                        Call<List<RepoBean>> call = repositoryService.getRepos();
+                        call.enqueue(new Callback<List<RepoBean>>() {
+                            @Override
+                            public void onResponse(Call<List<RepoBean>> call, Response<List<RepoBean>> response) {
+                                if (response.isSuccessful()) {
+                                    List<RepoBean> repoBeans = response.body();
+                                    int n = repoBeans.size();
+                                    for ( int i = 0 ; i < n ; i++ ) {
+                                        RepoBean temp = repoBeans.get(i);
+                                        repos.add(new Repo(temp.getAuthor(), temp.getAvatar(), temp.getName(),
+                                                temp.getUrl(), temp.getDescription(), temp.getLanguage(),
+                                                temp.getLanguageColor(), temp.getStars(), temp.getForks()));
+                                    }
+                                    mReposDao.deleteRepos();
+                                    mReposDao.addRepos(repos);
+                                    callback.onReposLoaded(repos);
+                                } else {
+                                    callback.onDataNotAvailable();
+                                }
+                            }
+                            @Override
+                            public void onFailure(Call<List<RepoBean>> call, Throwable t) {
+                                callback.onDataNotAvailable();
+                            }
+                        });
                     }
-                    mReposDao.deleteRepos();
-                    mReposDao.addRepos(repos);
-                    callback.onReposLoaded(repos);
-                } else {
-                    callback.onDataNotAvailable();
-                }
+                });
             }
-            @Override
-            public void onFailure(Call<List<RepoBean>> call, Throwable t) {
-                callback.onDataNotAvailable();
-            }
-        });
+        };
+
+        mAppExecutors.diskIO().execute(runnable);
+
     }
 
     @Override

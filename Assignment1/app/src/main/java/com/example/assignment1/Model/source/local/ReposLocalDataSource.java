@@ -5,6 +5,7 @@ import androidx.annotation.VisibleForTesting;
 
 import com.example.assignment1.Model.Repo;
 import com.example.assignment1.Model.source.ReposDataSource;
+import com.example.assignment1.utils.AppExecutors;
 
 import java.util.List;
 
@@ -17,20 +18,23 @@ public class ReposLocalDataSource implements ReposDataSource {
 
     private static volatile ReposLocalDataSource INSTANCE;
 
+    private AppExecutors mAppExecutors;
+
     private ReposDao mReposDao;
 
 
     // Prevent direct instantiation.
     // 防止直接实例化。
-    private ReposLocalDataSource(@NonNull ReposDao reposDao) {
+    private ReposLocalDataSource(@NonNull AppExecutors appExecutors, @NonNull ReposDao reposDao) {
+        mAppExecutors = appExecutors;
         mReposDao = reposDao;
     }
 
-    public static ReposLocalDataSource getInstance(@NonNull ReposDao tasksDao) {
+    public static ReposLocalDataSource getInstance(@NonNull AppExecutors appExecutors, @NonNull ReposDao tasksDao) {
         if (INSTANCE == null) {
             synchronized (ReposLocalDataSource.class) {
                 if (INSTANCE == null)
-                    INSTANCE = new ReposLocalDataSource(tasksDao);
+                    INSTANCE = new ReposLocalDataSource(appExecutors, tasksDao);
             }
         }
         return INSTANCE;
@@ -43,15 +47,26 @@ public class ReposLocalDataSource implements ReposDataSource {
      */
     @Override
     public void getRepos(@NonNull final LoadReposCallback callback) {
-        final List<Repo> repos = mReposDao.getRepos();
-        if (repos.isEmpty()) {
-            // This will be called if the table is new or just empty.
-            // 如果表是新表或只是空表，则将调用它。
-            callback.onDataNotAvailable();
-        } else {
-            callback.onReposLoaded(repos);
-        }
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                final List<Repo> repos = mReposDao.getRepos();
+                mAppExecutors.mainThread().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (repos.isEmpty()) {
+                            // This will be called if the table is new or just empty.
+                            // 如果表是新表或只是空表，则将调用它。
+                            callback.onDataNotAvailable();
+                        } else {
+                            callback.onReposLoaded(repos);
+                        }
+                    }
+                });
 
+            }
+        };
+        mAppExecutors.diskIO().execute(runnable);
     }
 
     @Override
@@ -63,13 +78,13 @@ public class ReposLocalDataSource implements ReposDataSource {
 
     @Override
     public void deleteAllRepos() {
-        mReposDao.deleteRepos();
-    }
-
-
-    @VisibleForTesting
-    static void clearInstance() {
-        INSTANCE = null;
+        Runnable deleteRunnable = new Runnable() {
+            @Override
+            public void run() {
+                mReposDao.deleteRepos();
+            }
+        };
+        mAppExecutors.diskIO().execute(deleteRunnable);
     }
 }
 

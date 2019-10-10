@@ -11,7 +11,7 @@ import com.example.assignment1.Model.Repo;
  * The Room Database that contains the Repo table.
  * 包含Repo表的Room数据库。
  */
-@Database(entities = {Repo.class}, version = 1)
+@Database(entities = {Repo.class}, version = 1, exportSchema = false)
 public abstract class RepoDatabase extends RoomDatabase {
 
     private static RepoDatabase INSTANCE;
@@ -21,13 +21,11 @@ public abstract class RepoDatabase extends RoomDatabase {
     private static final Object sLock = new Object();
 
     public static RepoDatabase getInstance(Context context) {
-        synchronized (sLock) {
-            if (INSTANCE == null) {
-                INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
-                        RepoDatabase.class, "Repos.db")
-                        .build();
-            }
-            return INSTANCE;
+        if (INSTANCE == null) {
+            INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
+                    RepoDatabase.class, "Repos.db")
+                    .build();
         }
+        return INSTANCE;
     }
 }
