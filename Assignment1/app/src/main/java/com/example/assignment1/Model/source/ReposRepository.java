@@ -153,4 +153,12 @@ public class ReposRepository implements ReposDataSource {
         mCacheIsDirty = false;
     }
 
+    public void sortByName ( ) {
+
+    }
+
+    public void sortByStar ( ) {
+
+    }
+
 }

@@ -32,4 +32,8 @@ public interface ReposDataSource {
     void refreshRepos();
 
     void deleteAllRepos();
+
+    void sortByName();
+
+    void sortByStar();
 }

@@ -1,12 +1,13 @@
 package com.example.assignment1.Model.source.local;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.VisibleForTesting;
 
 import com.example.assignment1.Model.Repo;
 import com.example.assignment1.Model.source.ReposDataSource;
 import com.example.assignment1.utils.AppExecutors;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -85,6 +86,61 @@ public class ReposLocalDataSource implements ReposDataSource {
             }
         };
         mAppExecutors.diskIO().execute(deleteRunnable);
+    }
+
+    @Override
+    public void sortByName() {
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                List<Repo> cur = mReposDao.getRepos();
+                mAppExecutors.mainThread().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        Collections.sort(cur, new Comparator<Repo>() {
+                            @Override
+                            public int compare(Repo o1, Repo o2) {
+                                String name1 = o1.getName();
+                                String name2 = o2.getName();
+                                return  name1.compareTo(name2);
+                            }
+                        });
+                        mReposDao.deleteRepos();
+                        mReposDao.addRepos(cur);
+                    }
+                });
+
+            }
+        };
+        mAppExecutors.diskIO().execute(runnable);
+    }
+
+    @Override
+    public void sortByStar() {
+
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                List<Repo> cur = mReposDao.getRepos();
+                mAppExecutors.mainThread().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        Collections.sort(cur, new Comparator<Repo>() {
+                            @Override
+                            public int compare(Repo o1, Repo o2) {
+                                int star1 = o1.getStars();
+                                int star2 = o2.getStars();
+                                return star1 - star2;
+                            }
+                        });
+                        mReposDao.deleteRepos();
+                        mReposDao.addRepos(cur);
+                    }
+                });
+
+            }
+        };
+        mAppExecutors.diskIO().execute(runnable);
     }
 }
 

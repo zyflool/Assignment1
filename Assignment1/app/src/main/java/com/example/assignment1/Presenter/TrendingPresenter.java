@@ -44,11 +44,14 @@ public class TrendingPresenter implements TrendingContract.Presenter {
 
     @Override
     public void sortByName() {
+        mReposRepository.sortByName();
+        loadRepos(true, false);
     }
 
     @Override
     public void sortByStar() {
-
+        mReposRepository.sortByStar();
+        loadRepos(true, false);
     }
 
     @Override
@@ -104,6 +107,7 @@ public class TrendingPresenter implements TrendingContract.Presenter {
     private void processRepos(List<Repo> repos) {
         mTrendingView.showRepos(repos);
     }
+
 
 
 }
